@@ -257,7 +257,6 @@ while command != "E":
                 longest_line_len = line_len
 
         print(*text, sep="\n")
-
     elif command == "6":
         incorrect_expressions = []
         for line in text:
@@ -291,21 +290,25 @@ while command != "E":
         if incorrect_expressions:
             import sys
 
-            print("\033[91mНайдены некорректные выражения:", *incorrect_expressions,
+            print("\033[91mНайдены некорректные выражения:",
+                  *incorrect_expressions,
                   sep="\n", file=sys.stderr)
             print('\033[0m')
-
     elif command == "7":
 
         max_words_count = 0
         max_words_index = -1
+        max_sentence = []
+        sentence_words_count = 0
+        sentence = []
         for index in range(len(text)):
             line = text[index]
-            line_words_count = 0
             for word in line.split():
                 word = word.strip()
                 word_letters = {}
                 for letter in word:
+                    if not letter.isalpha():
+                        continue
                     if letter in word_letters:
                         word_letters[letter] += 1
                     else:
@@ -316,10 +319,14 @@ while command != "E":
                         all_letters_twice = False
                         break
                 if all_letters_twice:
-                    line_words_count += 1
-            if line_words_count > max_words_count:
-                max_words_count = line_words_count
-                max_words_index = index
+                    sentence_words_count += 1
+                sentence.append(word)
+                if word[-1] == ".":
+                    if sentence_words_count > max_words_count:
+                        max_words_count = sentence_words_count
+                        max_sentence = sentence
+                    sentence = []
+                    sentence_words_count = 0
         if max_words_count == 0:
             print("Нет таких строк")
         else:
