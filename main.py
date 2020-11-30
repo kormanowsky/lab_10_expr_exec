@@ -197,9 +197,8 @@ text = [
 Чжао Мань Янь увидел, что выбранная магия оказалось настолько успешной, и начал 
 снова формировать систему магии света. И второй удар нанес еще более серьезный 
 ущерб по злому вампиру!
-2*2+4
-3 // 3 % 2     2 + 5
-3 + 9 - 8 ** 1 - (9 - 4  % 5)
+
+2 + 5 % (4 + 2 ** 0.5) - 1 // 3 + 20 // 10 + 4 ** (10 - 2)
 """.split("\n") if len(line)]
 
 longest_line_len = 0
@@ -260,6 +259,7 @@ while command != "E":
         print(*text, sep="\n")
 
     elif command == "6":
+        incorrect_expressions = []
         for line in text:
             expressions = []
             expr_started = False
@@ -281,9 +281,19 @@ while command != "E":
                 prev_sym = sym
             if expr_started:
                 expressions.append(expr.strip())
+
             for expr in expressions:
-                line = line.replace(expr, exec_expr(expr))
+                try:
+                    line = line.replace(expr, exec_expr(expr))
+                except (OverflowError, ZeroDivisionError, ValueError):
+                    incorrect_expressions.append(expr)
             print(line)
+        if incorrect_expressions:
+            import sys
+
+            print("\033[91mНайдены некорректные выражения:", *incorrect_expressions,
+                  sep="\n", file=sys.stderr)
+            print('\033[0m')
 
     elif command == "7":
 
