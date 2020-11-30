@@ -97,7 +97,7 @@ def exec_expr(expression):
 
     # Этап 2.5. Некорректное выражение: открывающей нет, а закрывающая есть!
     elif expression.find(")") != -1:
-        return expression
+        raise ValueError(expression)
     # Этап 3. "Расчленяем" выражение на слагаемые,
     # считаем их отдельно, затем складываем
     elif expression.find("+") != -1 or expression.find("-", 1) != -1:
@@ -267,8 +267,8 @@ while command != "E":
             prev_sym = None
             for sym in line:
                 if sym.isdigit() or \
-                        sym in ["*", "+", "-", "/", "(", ")", "%", "√"] or \
-                        expr_started and sym in [" ", "."] and \
+                        sym in ["*", "+", "-", "/", "(", "%", "√"] or \
+                        expr_started and sym in [" ", ".", ")"] and \
                         prev_sym not in [" ", "."]:
                     if expr_started:
                         expr += sym
