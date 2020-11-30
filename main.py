@@ -1,7 +1,9 @@
 """
 Лабораторная работа 10. Автор - Михаил Кормановский, ИУ7-11Б, МГТУ им. Баумана
 """
-variables = {}
+from math import sqrt, e, pi
+
+variables = {"e": e, "pi": pi}
 
 
 def is_number(string):
@@ -10,10 +12,11 @@ def is_number(string):
     :param string: Строка, которую надо проверить
     :return: True/False, в зависимости от того, пройдена ли проверка
     """
-    for sym in string:
-        if not sym.isdigit() and sym != ".":
-            return False
-    return True
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False
 
 
 def exec_op(op_type, first_arg, second_arg=1):
@@ -26,7 +29,7 @@ def exec_op(op_type, first_arg, second_arg=1):
     :return: Вычисленное значение в виде int или float
     """
     if op_type == "√":
-        return float(first_arg) ** 0.5
+        return sqrt(first_arg)
     if op_type == "/":
         return float(first_arg) / float(second_arg)
     use_float = False
@@ -274,8 +277,8 @@ while command != "E":
                     to_left = line[:eq_index].strip().split()
                     to_right = line[eq_index + 1:].strip().split()
                     if not to_left or not to_right:
-                        left_hand_side=""
-                        right_hand_side=""
+                        left_hand_side = ""
+                        right_hand_side = ""
                     else:
                         left_hand_side = to_left[-1]
                         right_hand_side = to_right[0]
