@@ -1,6 +1,7 @@
 """
 Лабораторная работа 10. Автор - Михаил Кормановский, ИУ7-11Б, МГТУ им. Баумана
 """
+variables = {}
 
 
 def is_number(string):
@@ -199,6 +200,7 @@ text = [
 ущерб по злому вампиру!
 
 2 + 5 % (4 + 2 ** 0.5) - 1 // 3 + 20 // 10 + 4 ** (10 - 2)
+кошка=1 собака = 2 кошка + собака
 """.split("\n") if len(line)]
 
 longest_line_len = 0
@@ -259,11 +261,43 @@ while command != "E":
         print(*text, sep="\n")
     elif command == "6":
         incorrect_expressions = []
+        _text = []
         for line in text:
+            line = line.replace("= ", "=").replace(" =", "=")
+            eq_index = line.find("=")
+            while eq_index != -1:
+                if eq_index == 0:
+                    continue
+                elif eq_index == len(line) - 1:
+                    break
+                try:
+                    to_left = line[:eq_index].strip().split()
+                    to_right = line[eq_index + 1:].strip().split()
+                    if not to_left or not to_right:
+                        left_hand_side=""
+                        right_hand_side=""
+                    else:
+                        left_hand_side = to_left[-1]
+                        right_hand_side = to_right[0]
+                    declaration = [left_hand_side, right_hand_side]
+                    declaration_s = "{}={}".format(*declaration)
+                    line = line.replace(
+                        declaration_s, "")
+                    variables[declaration[0]] = float(declaration[1])
+                    if variables[declaration[0]].is_integer():
+                        variables[declaration[0]] = int(declaration[1])
+                except ValueError:
+                    incorrect_expressions.append(declaration_s)
+                eq_index = line.find("=")
+            _text.append(line)
+
+        for line in _text:
             expressions = []
             expr_started = False
             expr = ""
             prev_sym = None
+            for v in variables:
+                line = line.replace(v, str(variables[v]))
             for sym in line:
                 if sym.isdigit() or \
                         sym in ["*", "+", "-", "/", "(", "%", "√"] or \
