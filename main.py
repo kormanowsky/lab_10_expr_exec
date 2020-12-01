@@ -212,7 +212,8 @@ text = [
 кошка=1 собака = 2 кошка + собака
 коровка=-10 бычок = -15 коровка - бычок, коровка + бычок, коровка * бычок 
 √((коровка * бычок) + 19)
-√√√√√√√√√√√√√√√√√√√√√√√√√√√2**256
+√√√√√√√√√√√√√√√√√√√√√√√√√√√2**256.
+ aaa bbb ccc.
 """.split("\n") if len(line)]
 
 longest_line_len = 0
@@ -367,17 +368,17 @@ while command != "E":
                 if all_letters_twice:
                     sentence_words_count += 1
                 sentence.append(word)
-                if word[-1] == ".":
+                if word[-1] in [".", "!", "?"]:
                     if sentence_words_count > max_words_count:
                         max_words_count = sentence_words_count
                         max_sentence = sentence
                     sentence = []
                     sentence_words_count = 0
         if max_words_count == 0:
-            print("Нет таких строк")
+            print("Нет таких предложений")
         else:
-            print("Искомая строка:")
-            print(text[max_words_index])
+            print("Искомое предложение:")
+            print(" ".join(max_sentence))
 
     elif command == "M":
         print("Доступные команды:")
