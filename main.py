@@ -19,7 +19,7 @@ def is_number(string):
         return False
 
 
-def exec_op(op_type, first_arg, second_arg=1):
+def exec_op(op_type, first_arg, second_arg=""):
     """
     Вычисление значения операции.
     :param op_type: Тип операции, строка как в исходном выражении.
@@ -29,7 +29,7 @@ def exec_op(op_type, first_arg, second_arg=1):
     :return: Вычисленное значение в виде int или float
     """
     if op_type == "√":
-        return sqrt(first_arg)
+        return sqrt(float(first_arg))
     if op_type == "/":
         return float(first_arg) / float(second_arg)
     use_float = False
@@ -60,15 +60,19 @@ def exec_op(op_type, first_arg, second_arg=1):
     return int(first_arg) * int(second_arg)
 
 
-def exec_expr(expression):
+def exec_expr(expression, stage=0):
     """
     Вычисление арифметического выражения
     :param expression: Выражение, значение которого требуется вычислить
+    :param stage: Этап вычислений
     :return: Вычисленное значение в виде строки
     """
 
-    # Этап 1. Удаляем пробелы, заменяем запятые на точки
-    expression = expression.strip().replace(" ", "").replace(",", ".")
+    if not expression:
+        raise ValueError(expression)
+
+    # Этап 1. Удаляем пробелы
+    expression = expression.strip().replace(" ", "").replace("--", "+")
 
     # Этап 2. Если есть выражения в скобках, считаем их
     if expression.find("(") != -1:
@@ -92,7 +96,7 @@ def exec_expr(expression):
                 level -= 1
 
         if level != 0:
-            return expression
+            raise ValueError(expression)
 
         for b_expr in bracket_expr:
             expression = expression.replace("(" + b_expr + ")",
@@ -104,22 +108,24 @@ def exec_expr(expression):
         raise ValueError(expression)
     # Этап 3. "Расчленяем" выражение на слагаемые,
     # считаем их отдельно, затем складываем
-    elif expression.find("+") != -1 or expression.find("-", 1) != -1:
+    elif stage == 0 and (
+            expression.find("+") != -1 or expression.find("-", 1) != -1):
         parts = []
         first_part_sym = 0
         last_sym = "+"
         for index in range(len(expression)):
             if expression[index] in ["+", "-"] and (
-                    index == 0 or expression[index - 1] != "e"):
-                parts.append([last_sym, expression[first_part_sym:index]])
-                first_part_sym = index + 1
-                last_sym = expression[index]
+                    index == 0 or expression[index - 1].isdigit()):
+                if expression[first_part_sym:index]:
+                    parts.append([last_sym, expression[first_part_sym:index]])
+                    first_part_sym = index + 1
+                    last_sym = expression[index]
         parts.append([last_sym, expression[first_part_sym:]])
         result = "0"
         for part in parts:
             result = str(exec_op(part[0], result,
                                  part[1] if is_number(part[1])
-                                 else exec_expr(part[1])
+                                 else exec_expr(part[1], stage=1)
                                  )
                          )
         return result
@@ -131,17 +137,17 @@ def exec_expr(expression):
         parts = []
         first_part_sym = 0
         last_sym = "*"
+        expression = expression.replace("**", "POW")
         for index in range(len(expression)):
             if expression[index] == "%":
                 parts.append([last_sym, expression[first_part_sym:index]])
                 first_part_sym = index + 1
                 last_sym = expression[index]
-            elif expression[index] == "*" and (
-                    index == 0 or expression[index - 1] != "*" or index == len(
-                expression) - 1 or expression[index + 1] != "*"):
-                parts.append([last_sym, expression[first_part_sym:index]])
-                first_part_sym = index + 1
-                last_sym = expression[index]
+            elif expression[index] == "*":
+                if expression[first_part_sym:index]:
+                    parts.append([last_sym, expression[first_part_sym:index]])
+                    first_part_sym = index + 1
+                    last_sym = expression[index]
             elif expression[index] == "/":
                 if expression[index - 1] != expression[index] and \
                         expression[index + 1] != expression[index]:
@@ -160,7 +166,7 @@ def exec_expr(expression):
             result = str(exec_op(part[0], result,
                                  part[1] if is_number(
                                      part[1]) else exec_expr(
-                                     part[1])))
+                                     part[1].replace("POW", "**"))))
         return result
 
     # Этап 5. Считаем степени. Поведение как в Python, 2 ** 5 ** 3 = 2 ** 125
@@ -204,6 +210,9 @@ text = [
 
 2 + 5 % (4 + 2 ** 0.5) - 1 // 3 + 20 // 10 + 4 ** (10 - 2)
 кошка=1 собака = 2 кошка + собака
+коровка=-10 бычок = -15 коровка - бычок, коровка + бычок, коровка * бычок 
+√((коровка * бычок) + 19)
+√√√√√√√√√√√√√√√√√√√√√√√√√√√2**256
 """.split("\n") if len(line)]
 
 longest_line_len = 0
