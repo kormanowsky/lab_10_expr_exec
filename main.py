@@ -182,7 +182,9 @@ def exec_expr(expression, stage=0):
 
     # Этап 6. Считаем корни
     elif not is_number(expression):
-        return str(exec_op("√", exec_expr(expression[1:])))
+        expression = expression.replace("+", "")
+        if not is_number(expression):
+            return str(exec_op("√", exec_expr(expression[1:])))
 
     # Этап 7. Возвращаем ответ
     return expression
