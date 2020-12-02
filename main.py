@@ -189,7 +189,8 @@ def exec_expr(expression, stage=0):
 
 
 text = [
-    line.strip() for line in """(1-2+3-e)Не Дун бегал от огня, в панике размахивая своими 
+    line.strip() for line in """(1-2+3-e)Не Дун бегал от огня, в панике 
+    размахивая своими 
     когтищами, и раз за 
     разом натыкался ими на ближайшие здания.
 
@@ -213,22 +214,24 @@ text = [
 коровка=-10 бычок = -15 коровка - бычок, коровка + бычок, коровка * бычок 
 √((коровка * бычок) + 19)
 √√√√√√√√√√√√√√√√√√√√√√√√√√√2**256.
+------1
  aaa bbb ccc.
 """.split("\n") if len(line)]
-
-longest_line_len = 0
-for line in text:
-    line_len = len(line)
-    if longest_line_len < line_len:
-        longest_line_len = line_len
 
 print("Лабораторная работа 10. Автор - Михаил Кормановский, ИУ7-11Б")
 
 command = None
+longest_line_len = 0
+
 while command != "E":
 
     if command is None:
         command = "M"
+
+    for line in text:
+        line_len = len(line)
+        if longest_line_len < line_len:
+            longest_line_len = line_len
 
     if command == "1":
         for line in text:
@@ -241,7 +244,7 @@ while command != "E":
             line_len = len(line)
             words = line.split()
             words_len = len(words)
-            if words_len < 2:
+            if words_len < 2 or line_len == longest_line_len:
                 print(line)
             else:
                 space_width = (longest_line_len - line_len + words_len) // (
@@ -264,12 +267,7 @@ while command != "E":
         if command == "5":
             new_word = input("Введите слово, на которое заменить:")
 
-        text = [line.replace(word, new_word) for line in text]
-
-        for line in text:
-            line_len = len(line)
-            if longest_line_len < line_len:
-                longest_line_len = line_len
+        text = [line.replace(word.strip(), new_word.strip()) for line in text]
 
         print(*text, sep="\n")
     elif command == "6":
@@ -335,12 +333,14 @@ while command != "E":
                     incorrect_expressions.append(expr)
             print(line)
         if incorrect_expressions:
+
             import sys
 
             print("\033[91mНайдены некорректные выражения:",
                   *incorrect_expressions,
                   sep="\n", file=sys.stderr)
             print('\033[0m')
+
     elif command == "7":
 
         max_words_count = 0
@@ -360,7 +360,7 @@ while command != "E":
                         word_letters[letter] += 1
                     else:
                         word_letters[letter] = 1
-                all_letters_twice = True
+                all_letters_twice = bool(word_letters)
                 for letter in word_letters:
                     if word_letters[letter] < 2:
                         all_letters_twice = False
