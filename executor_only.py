@@ -4,6 +4,8 @@
 
 from math import sqrt
 from sys import stderr
+from datetime import datetime
+
 
 def is_number(string):
     """
@@ -191,10 +193,19 @@ def exec_expr(expression, stage=0):
 
 try:
     inp = input("Введите выражение: ")
-    res1 = exec_expr(inp)
-    res2 = eval(inp)
-    print("Результат exec_expr:", res1)
-    print("Результат      eval:", res2)
+    runs = int(input("Введите число запусков: "))
+    res1 = res2 = 0
+    exec_start_ts = datetime.now()
+    for i in range(runs):
+        res1 = exec_expr(inp)
+    exec_end_ts = eval_start_ts = datetime.now()
+    for i in range(runs):
+        res2 = eval(inp)
+    eval_end_ts = datetime.now()
+    print("Результат exec_expr:", res1, "за",
+          (exec_end_ts - exec_start_ts) / runs, "(в среднем)")
+    print("Результат      eval:", res2, "за",
+          (eval_end_ts - eval_start_ts) / runs, "(в среднем)")
     try:
         print("Разница:", abs(float(res1) - res2))
         print("Значения ", "не " if abs(float(res1) - res2) > 1e-6 else "",
@@ -203,6 +214,6 @@ try:
         print("Разница:", abs(int(res1) - res2))
         print("Значения ", "не " if abs(int(res1) - res2) else "", "равны",
               sep="")
-except (ValueError, SyntaxError):
+except (ValueError, SyntaxError, IndexError):
     print("\033[91mНекорректное выражение", file=stderr)
     exit(1)

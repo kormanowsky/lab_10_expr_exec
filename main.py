@@ -331,11 +331,12 @@ while command != "E":
             for expr in expressions:
                 try:
                     line = line.replace(expr, exec_expr(expr))
-                except (OverflowError, ZeroDivisionError, ValueError):
+                except (
+                    OverflowError, ZeroDivisionError, ValueError, IndexError
+                ):
                     incorrect_expressions.append(expr)
             print(line)
         if incorrect_expressions:
-
             import sys
 
             print("\033[91mНайдены некорректные выражения:",
